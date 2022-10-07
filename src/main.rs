@@ -4,6 +4,7 @@ use day::Day;
 mod helper;
 use helper::EnsureSuccess;
 
+use inquire::InquireError;
 use inquire::{formatter::MultiOptionFormatter, MultiSelect};
 use reqwest::cookie::{CookieStore, Jar};
 use reqwest::{Client, Url};
@@ -176,7 +177,18 @@ async fn main() -> Result<()> {
         .with_formatter(formatter)
         .prompt();
 
-    let days = ans.wrap_err("Error selecting days")?;
+    let days = match ans {
+        Ok(days) => days,
+        Err(inquire_error) => {
+            return match inquire_error {
+                InquireError::OperationCanceled | InquireError::OperationInterrupted => {
+                    println!("Selection canceled");
+                    Ok(())
+                }
+                _ => Err(inquire_error).wrap_err("Selection failed"),
+            }
+        }
+    };
 
     for day in days {
         println!("Submitting: {}", day);
