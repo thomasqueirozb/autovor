@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.22"
-clap = { version = "3.2.20", features = ["derive"] }
+clap = { version = "4.0.10", features = ["derive"] }
 color-eyre = "0.6.2"
 inquire = "0.3.0"
 reqwest = { git = "https://github.com/thomasqueirozb/reqwest", branch = "base_url_check", features = ["cookies"] }
