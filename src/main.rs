@@ -34,10 +34,12 @@ struct Args {
     /// what a browser actually would do.
     #[clap(long)]
     emulate_browser: bool,
+    /*
 
     /// Don't ask for user input (NOT RECOMENDED)
     #[clap(long)]
     automatic: bool,
+    */
 }
 
 #[tokio::main]
