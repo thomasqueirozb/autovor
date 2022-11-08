@@ -1,8 +1,9 @@
 use crate::day::Day;
 use crate::helper::EnsureSuccess;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
+use async_scoped::TokioScope;
 use chrono::prelude::*;
 use color_eyre::eyre::{ensure, Context, ContextCompat};
 use color_eyre::Result;
@@ -140,6 +141,35 @@ impl Session {
 
         ensure!(!days.is_empty(), "No days found");
         Ok(days)
+    }
+
+    pub async fn submit_multiple_simultaneously(
+        &self,
+        ids: Vec<String>,
+        form: &[(&str, &str); 6],
+    ) -> Result<()> {
+        let ids: HashSet<String> = ids.into_iter().collect();
+
+        let (_, outputs) = TokioScope::scope_and_block(|s| {
+            for id in ids {
+                s.spawn(async {
+                    self.submit(id.clone(), form).await?;
+                    Ok::<String, color_eyre::eyre::Report>(id)
+                });
+            }
+        });
+
+        // Error handling is lacking here since there seems to be no way of getting `outputs` in the
+        // same order as the futures were spawned
+        outputs
+            .into_iter()
+            .collect::<Result<Vec<_>, _>>()
+            .wrap_err("Failed to join one more more submit futures")?
+            .into_iter()
+            .collect::<Result<Vec<_>, _>>()
+            .wrap_err("Submission failed")?;
+
+        Ok(())
     }
 
     // TODO make a better API. Using the 'raw' form as a parameter is ugly
