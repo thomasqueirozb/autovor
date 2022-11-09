@@ -1,6 +1,5 @@
-// #![warn(clippy::cargo)]
-// #![allow(clippy::multiple_crate_versions)]
-#![warn(clippy::pedantic, clippy::nursery, clippy::style)]
+#![warn(clippy::pedantic, clippy::nursery, clippy::style, clippy::cargo)]
+#![allow(clippy::multiple_crate_versions)]
 
 mod day;
 use day::Day;
