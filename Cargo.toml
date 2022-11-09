@@ -3,7 +3,13 @@ name = "autovor"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Unofficial CLI for Endeavor"
+repository = "https://github.com/thomasqueirozb/autovor"
+readme = "README.md"
+license = "AGPL-3.0"
+
+categories = ["command-line-utilities"]
+keywords = ["endeavor", "cli"]
 
 [dependencies]
 chrono = "0.4.22"
