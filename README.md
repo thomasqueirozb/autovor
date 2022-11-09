@@ -1,6 +1,6 @@
 # Autovor
 
-Unofficial CLI for Endeavor
+Unofficial CLI for [Endeavor](https://www.endeavor.net.br/horas)
 
 **This project is not associated with Endeavor**
 
@@ -8,7 +8,7 @@ Unofficial CLI for Endeavor
 
 First of all create a file named `creds.txt` on the same folder you are going to run the program from. This file must contain **ONLY** 2 lines, the first being your login and the second being your password.
 
-If you encounter any problems try running it with the `--emulate-browser` flag. This will make it so some _unnecessary_ GET requests are made in between operations, just like a browser would. If you find that this is necessary or something else doesn't work, please open an [issue](https://github.com/thomasqueirozb/autovor/issues/new).
+If you encounter any problems try running it with the `--emulate-browser` flag. This will make it so some _unnecessary_ GET requests are made in between operations, just like a browser would. If you find that this is necessary or something else doesn't work, please [open an issue](https://github.com/thomasqueirozb/autovor/issues).
 
 There are also other flags. You can check them out by running `--help`.
 
