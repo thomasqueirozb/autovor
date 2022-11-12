@@ -125,7 +125,6 @@ impl Session {
         }
         days.sort_by(|a, b| a.date.cmp(&b.date));
 
-        ensure!(!days.is_empty(), "No days found");
         Ok(days)
     }
 

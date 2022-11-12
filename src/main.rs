@@ -72,6 +72,7 @@ async fn main() -> Result<()> {
         .wrap_err("Failed to login")?;
 
     let days = session.get_days().await?;
+    ensure!(!days.is_empty(), "No days found");
 
     let formatter: MultiOptionFormatter<Day> =
         &|day_list| format!("Selected days: {}", day_list.len());
