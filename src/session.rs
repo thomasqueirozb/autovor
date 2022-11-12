@@ -28,10 +28,11 @@ pub struct Session {
     client: Client,
     cookie_store: Arc<CookieStoreMutex>,
     emulate_browser: bool,
+    all_days: bool,
 }
 
 impl Session {
-    pub fn new(emulate_browser: bool) -> Result<Self> {
+    pub fn new(all_days: bool, emulate_browser: bool) -> Result<Self> {
         let cookie_store = CookieStoreMutex::new(CookieStore::default());
         let cookie_store = Arc::new(cookie_store);
 
@@ -46,6 +47,7 @@ impl Session {
             client,
             cookie_store,
             emulate_browser,
+            all_days,
         })
     }
 
@@ -117,8 +119,7 @@ impl Session {
 
             let day = Day::new(&id_date, project_info)?;
 
-            // TODO add option to disable this check
-            if day.date <= today {
+            if self.all_days || day.date <= today {
                 days.push(day);
             }
         }

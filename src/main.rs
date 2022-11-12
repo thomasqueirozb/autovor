@@ -29,6 +29,10 @@ struct Args {
     #[clap(short, long, value_parser, default_value = "creds.txt")]
     creds_path: PathBuf,
 
+    /// Default behavior is to not show days in the future.
+    #[clap(short, long)]
+    all_days: bool,
+
     /// If specified, unecessary requests will be made so that it better emulates
     /// what a browser actually would do.
     #[clap(long)]
@@ -60,7 +64,7 @@ async fn main() -> Result<()> {
 
     let (password, username) = (creds.pop().unwrap(), creds.pop().unwrap());
 
-    let mut session = Session::new(args.emulate_browser)?;
+    let mut session = Session::new(args.all_days, args.emulate_browser)?;
 
     session
         .login(username.clone(), password.clone())
