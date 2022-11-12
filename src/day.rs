@@ -1,10 +1,13 @@
-use chrono::prelude::*;
-use color_eyre::eyre::{ensure, Context, ContextCompat, Result};
 use std::fmt;
 
-#[derive(Debug)]
+use chrono::prelude::*;
+use color_eyre::eyre::{ensure, Context, ContextCompat, Result};
+use serde::Serialize;
+
+#[derive(Debug, Serialize)]
 pub struct Day {
     pub id: String,
+    #[serde(with = "crate::helper::naive_date_serializer")]
     pub date: NaiveDate,
     pub project_number: String,
     pub customer: String,

@@ -37,6 +37,10 @@ struct Args {
     /// what a browser actually would do.
     #[clap(long)]
     emulate_browser: bool,
+
+    /// Get days output as JSON
+    #[clap(long)]
+    get_days_json: bool,
     /*
 
     /// Don't ask for user input (NOT RECOMENDED)
@@ -72,6 +76,11 @@ async fn main() -> Result<()> {
         .wrap_err("Failed to login")?;
 
     let days = session.get_days().await?;
+
+    if args.get_days_json {
+        println!("{}", serde_json::to_string(&days)?);
+        return Ok(());
+    }
     ensure!(!days.is_empty(), "No days found");
 
     let formatter: MultiOptionFormatter<Day> =

@@ -40,3 +40,16 @@ impl EnsureSuccess for Response {
         Ok(self)
     }
 }
+
+pub mod naive_date_serializer {
+    use chrono::NaiveDate;
+    use serde::Serializer;
+
+    pub fn serialize<S>(date: &NaiveDate, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = format!("{}", date.format("%Y/%m/%d"));
+        serializer.serialize_str(&s)
+    }
+}
