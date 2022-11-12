@@ -1,14 +1,15 @@
 use crate::day::Day;
 use crate::helper::EnsureSuccess;
-use std::collections::HashMap;
+
+use color_eyre::eyre::{ensure, eyre, ContextCompat};
+use color_eyre::Result;
+
+use once_cell::sync::Lazy;
 use std::sync::Arc;
 
 use chrono::prelude::*;
-use color_eyre::eyre::{ensure, Context, ContextCompat};
-use color_eyre::Result;
-use once_cell::sync::Lazy;
-use reqwest::cookie::{CookieStore, Jar};
-use reqwest::{Client, IntoUrl, Url};
+use reqwest::{Client, IntoUrl};
+use reqwest_cookie_store::{CookieStore, CookieStoreMutex};
 use scraper::{Html, Selector};
 
 // Selectors
@@ -25,16 +26,17 @@ static PROJECT_INFO_SELECTOR: Lazy<Selector> =
 
 pub struct Session {
     client: Client,
-    cookie_jar: Arc<Jar>,
+    cookie_store: Arc<CookieStoreMutex>,
     emulate_browser: bool,
 }
 
 impl Session {
     pub fn new(emulate_browser: bool) -> Result<Self> {
-        let cookie_jar = Arc::new(Jar::default());
+        let cookie_store = CookieStoreMutex::new(CookieStore::default());
+        let cookie_store = Arc::new(cookie_store);
 
         let client = Client::builder()
-            .cookie_provider(cookie_jar.clone())
+            .cookie_provider(cookie_store.clone())
             .http1_only()
             .http1_title_case_headers()
             .base_url("https://www.endeavor.net.br/".into())
@@ -42,7 +44,7 @@ impl Session {
 
         Ok(Self {
             client,
-            cookie_jar,
+            cookie_store,
             emulate_browser,
         })
     }
@@ -64,32 +66,16 @@ impl Session {
             .await?
             .ensure_success_or("Login post failed")?;
 
-        let cookies = self
-            .cookie_jar
-            .cookies(&Url::parse("https://www.endeavor.net.br").unwrap())
-            .wrap_err("Could not find cookies for www.endeavor.net.br after login")?;
+        let cookie_store = self
+            .cookie_store
+            .lock()
+            .or(Err(eyre!("Failed to lock cookie store")))?;
 
-        // NOTE: the cookie jar trait doesn't define an easy way to get a HashMap of cookies or even to
-        //       get the value of a specific cookie. Therefore the following is needed
+        for cookie in ["ENDEAVORu", "ENDEAVORp"] {
+            let found = cookie_store.contains("www.endeavor.net.br", "/", cookie);
+            ensure!(found, format!("Cookie {cookie} not found"))
+        }
 
-        let cookies = cookies
-            .to_str()
-            .wrap_err("Cannot convert cookies to string")?;
-
-        let cookies: HashMap<&str, &str> = cookies
-            .split("; ") // Cookies cannot contain ';' or ' ' in them, so splitting is fine
-            .map(|pair| pair.split_once('=').unwrap()) // Implementation always adds a '='
-            .collect();
-
-        ensure!(
-            cookies.contains_key("ENDEAVORu"),
-            "ENDEAVORu is not a cookie"
-        );
-
-        ensure!(
-            cookies.contains_key("ENDEAVORp"),
-            "ENDEAVORp is not a cookie"
-        );
         Ok(())
     }
 
