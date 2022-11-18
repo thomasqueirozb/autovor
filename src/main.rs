@@ -39,8 +39,12 @@ struct Args {
     emulate_browser: bool,
 
     /// Get days output as JSON
-    #[clap(long)]
+    #[clap(long, conflicts_with = "get_days_csv")]
     get_days_json: bool,
+
+    /// Get days output as CSV
+    #[clap(long, conflicts_with = "get_days_json")]
+    get_days_csv: bool,
     /*
 
     /// Don't ask for user input (NOT RECOMENDED)
@@ -79,6 +83,14 @@ async fn main() -> Result<()> {
 
     if args.get_days_json {
         println!("{}", serde_json::to_string(&days)?);
+        return Ok(());
+    } else if args.get_days_csv {
+        let mut writer = csv::Writer::from_writer(vec![]);
+        for day in days {
+            writer.serialize(day)?;
+        }
+
+        println!("{}", String::from_utf8(writer.into_inner()?)?);
         return Ok(());
     }
     ensure!(!days.is_empty(), "No days found");
