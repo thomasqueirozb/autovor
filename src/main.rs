@@ -18,6 +18,7 @@ use clap::Parser;
 use color_eyre::eyre::{ensure, Context, Result};
 
 /// CLI for Endeavor
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
@@ -116,7 +117,7 @@ async fn main() -> Result<()> {
     };
 
     for day in days {
-        println!("Submitting: {}", day);
+        println!("Submitting: {day}");
         let id = &day.id;
 
         // TODO don't hard code this
@@ -132,7 +133,7 @@ async fn main() -> Result<()> {
         session
             .submit(id.clone(), form)
             .await
-            .wrap_err_with(|| format!("Failed to submit hours for {}", day))?;
+            .wrap_err_with(|| format!("Failed to submit hours for {day}"))?;
     }
 
     Ok(())

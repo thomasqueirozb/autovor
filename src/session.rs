@@ -75,7 +75,7 @@ impl Session {
 
         for cookie in ["ENDEAVORu", "ENDEAVORp"] {
             let found = cookie_store.contains("www.endeavor.net.br", "/", cookie);
-            ensure!(found, format!("Cookie {cookie} not found"))
+            ensure!(found, format!("Cookie {cookie} not found"));
         }
 
         Ok(())
