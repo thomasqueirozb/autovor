@@ -39,13 +39,17 @@ struct Args {
     #[clap(long)]
     emulate_browser: bool,
 
-    /// Get days output as JSON
+    /// [NON-INTERACTIVE] Get days output as JSON
     #[clap(long, conflicts_with = "get_days_csv")]
     get_days_json: bool,
 
-    /// Get days output as CSV
+    /// [NON-INTERACTIVE] Get days output as CSV
     #[clap(long, conflicts_with = "get_days_json")]
     get_days_csv: bool,
+
+    /// [NON-INTERACTIVE] Submit IDs. Comma separated list of IDs
+    #[clap(long, value_delimiter = ',', conflicts_with_all = ["get_days_json", "get_days_csv"])]
+    submit_ids: Option<Vec<String>>,
     /*
 
     /// Don't ask for user input (NOT RECOMENDED)
@@ -79,6 +83,32 @@ async fn main() -> Result<()> {
         .login(username.clone(), password.clone())
         .await
         .wrap_err("Failed to login")?;
+
+    // Check non-interactive flags
+    if let Some(submit_ids) = args.submit_ids {
+        for id in submit_ids {
+            if id.is_empty() {
+                continue;
+            }
+
+            println!("Submitting id: {id}");
+            // TODO don't hard code this
+            let form = &[
+                ("horas_normais_horas", "8"),
+                ("horas_normais_minutos", "00"),
+                ("horas_extras_horas", "00"),
+                ("horas_extras_minutos", "00"),
+                ("horas_dobro_horas", "00"),
+                ("horas_dobro_minutos", "00"),
+            ];
+
+            session
+                .submit(id.clone(), form)
+                .await
+                .wrap_err_with(|| format!("Failed to submit hours for id: {id}"))?;
+        }
+        return Ok(());
+    }
 
     let days = session.get_days().await?;
 
