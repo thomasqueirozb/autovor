@@ -12,6 +12,7 @@ mod helper;
 use inquire::InquireError;
 use inquire::{formatter::MultiOptionFormatter, MultiSelect};
 
+use std::env;
 use std::path::PathBuf;
 
 use clap::Parser;
@@ -60,22 +61,27 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    dotenvy::dotenv().ok(); // Don't return if .env not found
     color_eyre::install()?;
 
     let args = Args::parse();
 
-    let mut creds = std::fs::read_to_string(&args.creds_path)?
-        .lines()
-        .map(String::from)
-        .map(|s| s.trim().to_string())
-        .collect::<Vec<String>>();
-    ensure!(
-        creds.len() == 2,
-        "{} must have exactly 2 lines",
-        args.creds_path.to_string_lossy()
-    );
-
-    let (password, username) = (creds.pop().unwrap(), creds.pop().unwrap());
+    let (password, username) = match (env::var("USERNAME"), env::var("PASSWORD")) {
+        (Ok(username), Ok(password)) => (password, username),
+        (_, _) => {
+            let mut creds = std::fs::read_to_string(&args.creds_path)?
+                .lines()
+                .map(String::from)
+                .map(|s| s.trim().to_string())
+                .collect::<Vec<String>>();
+            ensure!(
+                creds.len() == 2,
+                "{} must have exactly 2 lines",
+                args.creds_path.to_string_lossy()
+            );
+            (creds.pop().unwrap(), creds.pop().unwrap())
+        }
+    };
 
     let mut session = Session::new(args.all_days, args.emulate_browser)?;
 

@@ -6,7 +6,7 @@ Unofficial CLI for [Endeavor](https://www.endeavor.net.br/horas)
 
 ## Usage
 
-First of all create a file named `creds.txt` on the same folder you are going to run the program from. This file must contain **ONLY** 2 lines, the first being your login and the second being your password.
+Either set the USERNAME and PASSWORD environment variables. You can do that by setting copying the `.env.example` file to `.env` and editing the values inside. You could alternatively create a file named `creds.txt` on the same folder you are going to run the program from, containing **ONLY** 2 lines, the first being your login and the second being your password.
 
 If you encounter any problems try running it with the `--emulate-browser` flag. This will make it so some _unnecessary_ GET requests are made in between operations, just like a browser would. If you find that this is necessary or something else doesn't work, please [open an issue](https://github.com/thomasqueirozb/autovor/issues).
 
@@ -15,8 +15,8 @@ There are also other flags. You can check them out by running `--help`.
 ## TODOs
 
 - [ ] Make some sort of config file, so the amount of hours isn't hard coded (currently 8)
-- [ ] Improve credential storage (somehow)
-- [ ] Add flags to make this be able to run non-interactively
+- [x] Improve credential storage (somehow)
+- [x] Add flags to make this be able to run non-interactively
 - [ ] Add a session/cookies caching mechanism, so logging in everytime wouldn't be required
 - [ ] Internationalization support
 - [ ] Publish as a crate (maybe)
